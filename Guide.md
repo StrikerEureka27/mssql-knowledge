@@ -95,6 +95,37 @@ We have the options in properties of the instance to enable C2 audit tracing, th
 InstaceSQL > Properties > Security > Enable C2 audit tracing
 ```
 
+### SQL server audit log
+
+Save a historic for changes that are related to permissions 
+
+```
+Security > Audits > New Audit
+```
+
+We can select the exit type for de audit, in this case I select File output, Then we create Server audits Specifications 
+
+```
+Security > Audits > Server Audit Specification
+```
+
+Here the most common audit Action type to select are:
+
+```
+DATA_ROLE_MEMBER_CHANGE_GROUP
+SERVER_ROLE_MEMBER_CHANGE_GROUP
+DATABASE_PERMISSION_CHANGE_GROUP
+SERVER_OBJECT_PERMISSION_CHANGE_GROUP
+DATABASE_PRINCIPAL_CHANGE_GROUP
+SERVER_PRINCIPAL_CHANGE_GROUP
+```
+
+
+
+
+
+
+
 ## Server properties configurations
 
 Limit the memory, the recommendations is to have 20% of the total memory (RAM)
@@ -190,6 +221,12 @@ Management > DatabaseMail > Configure Database Mail
 ##  Operators and Alerts
 
 We can create Operators that execute a SSIS package, Transact SQL script and CLR when SQL server instance generate a specific Alert this could be a Error number a warning an stuff like that. We can relation a alert to notify us at a gmail
+
+There are tree types of alert
+
+- SQL Server event alert
+- SQL Server performance condition alert
+- WMI event alert
 
 
 
