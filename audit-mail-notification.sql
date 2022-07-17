@@ -19,10 +19,17 @@ DECLARE @current_event_time VARCHAR(255)
 DECLARE @last_event_time DATETIME2(7)
 DECLARE @current_count_event INTEGER
 -- SMTP template
-DECLARE @encabezado VARCHAR(MAX)
+DECLARE @headers VARCHAR(MAX)
+DECLARE @footer VARCHAR(MAX)
+DECLARE @Table VARCHAR(MAX)
+DECLARE @table_rows VARCHAR(MAX)
+DECLARE @row VARCHAR(MAX)
+DECLARE @table_header VARCHAR(MAX)
+DECLARE @mail VARCHAR(MAX)
 
 -- Initialize variables
 SET @count_temp = 1
+SET @table_rows = ''
 SET @count_event = (SELECT COUNT(event_time) FROM sys.fn_get_audit_file('E:\BKSQLSERVER\AUDIT\Auditoria*',default, default))
 USE DBAudit
 SET @last_event_time = (SELECT last_event FROM audit_events WHERE id=1)
@@ -46,8 +53,26 @@ PRINT 'current_event_time: ' + CAST(CAST(@current_event_time AS datetime2(7)) AS
 PRINT '-----------------------'
 
 
-SET @encabezado  = '<html><head>' + '<style>' +
-	
+SET @headers  = ('<html> <style> *{ border: 0; padding: 0; font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif; } table, th, td { border: 1px solid black; } th{ color: white; background-color: black; } td { min-width: 200px; } </style><head>'
+ + '<h1>Registro de actividades sobre SQL server</h1>' 
+ + '<h3>Host: <span>' + @@Servername + '</span></h3>' 
+ + '<h3>Date: <span> ' + CAST(CURRENT_TIMESTAMP AS VARCHAR) + '</span></h3>'
+ + '</head><body>') 
+
+
+ SET @table_header = ('<table style="border: 1px solid black;">' 
+		+'<tr>'
+		+ '<th style="color: white; background-color: black;" >event_time</th>'
+		+ '<th style="color: white; background-color: black;" >session_name</th>'
+		+ '<th style="color: white; background-color: black;" >db_name</th>'
+		+ '<th style="color: white; background-color: black;" >obj_name</th>'
+		+ '<th style="color: white; background-color: black;" >statements</th>'
+		+ '<th style="color: white; background-color: black;" >hostname</th>'
+		+ '<th style="color: white; background-color: black;" >trans_id</th>'
+		+ '<th style="color: white; background-color: black;" >sucessed</th>'
+		+'</tr>')
+
+
 -- Open cursor
 OPEN db_cursor
 FETCH NEXT FROM db_cursor INTO @event_time, @session_name, @dbname, @obj_name, @stmnt, @hostname, @trans_id, @succeeded
@@ -59,11 +84,30 @@ BEGIN
 	UPDATE audit_events SET last_event = CAST(@current_event_time AS datetime2(7)), event_number = @count_event  WHERE id=1;
 	WHILE (@count_temp <= @current_count_event)
 	BEGIN
+	SET @row = ('<tr>'+
+		+ '<td style="min-width: 200px;" >' + @event_time + '</td>' 
+		+ '<td style="min-width: 200px;" >' + @session_name + '</td>'
+		+ '<td style="min-width: 55px;" >' + @dbname + '</td>' 
+		+ '<td style="min-width: 55px;" >' + @obj_name + '</td>' 
+		+ '<td style="min-width: 200px;" >' + @stmnt + ' </td>' 
+		+ '<td style="min-width: 100px;" >' + @hostname + ' </td>' 
+		+ '<td style="min-width: 60px;" >' + @trans_id + ' </td>' 
+		+ '<td style="min-width: 5px;" >' + CAST(@succeeded AS VARCHAR) + ' </td>' 
+		+'</tr>')
 		PRINT @event_time + ' ' + @stmnt
 		SET @count_temp = @count_temp + 1;
+		SET @table_rows = @table_rows + @row;
 		FETCH NEXT FROM db_cursor INTO @event_time, @session_name, @dbname, @obj_name, @stmnt, @hostname, @trans_id, @succeeded
 	END
-	SET @count_temp = 0
+	SET @footer = '</table></body></html>'
+	SET @mail = @headers + @table_header + @table_rows + @footer
+	PRINT @mail
+	EXEC msdb.dbo.sp_send_dbmail
+		@profile_name='DBA_profile',
+		@recipients='interserverapp2@gmail.com',
+		@subject='Informe de eventos',
+		@Body=@Mail,
+		@Body_format='HTML';
 END
 ELSE
 	PRINT 'There are not new events'
@@ -71,4 +115,5 @@ ELSE
 CLOSE db_cursor
 DEALLOCATE db_cursor
 GO
+
 
