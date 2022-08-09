@@ -2,15 +2,15 @@
 
 ### Enviroment configuration
 
-To make this guide, we create a Windows Server 2016 virtual environment  with the next servers:
+To make this guide, we create a Windows Server 2016 virtual environment with the following servers:
 
 - SRVCD2016
 - SRVDB12016
 - SRBDB22016
 
-SRVD2016 this server play the role of the domain controller, here we create and configure the network and here we configure the active directory configurations. 
+SRVD2016 this server serves as the domain controller, here we create and configure the network and we configure the active directory configurations. 
 
-SRVDB12016 this is our principal database server so here we install and configure SQL server instance, we active all the services unless R service for this guide, first recommendation for the storage is create different partitions for all read/write activity that makes the instance of SQL server, this is going to help SQL server instance to have a good performance in write/read activities, the partition it will be like:
+SRVDB12016 this is our principal database server so here we install and configure SQL server instance, we enable all the services except R service for this guide. First recommendation for the storage is to create a different partitions for all read/write activity that makes the instance of SQL server. This is going to help SQL server instance to help perform well write/read activities. The partition will be like:
 
 - LDF: Log de transactions 
 - TEMPDB: Temporal databases
@@ -18,7 +18,7 @@ SRVDB12016 this is our principal database server so here we install and configur
 - BACKUP: To storage our automatized backups.
 - SYSTEM: 
 
-SRBDB22016 this is our disaster server, so we going to to a mirroring arquitecture with SQL server tools. 
+SRBDB22016 this is our disaster server, so we are going to use a mirroring arquitecture with SQL server tools. 
 
 ### SQL server installation  and configuration
 
