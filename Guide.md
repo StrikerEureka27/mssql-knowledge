@@ -15,28 +15,28 @@ SRVDB12016 this is our principal database server so here we install and configur
 - LDF: Log de transactions 
 - TEMPDB: Temporal databases
 - MDF: All database data
-- BACKUP: To storage our automatized backups.
+- BACKUP: To store automatic backups.
 - SYSTEM: 
 
 SRBDB22016 this is our disaster server, so we are going to use a mirroring arquitecture with SQL server tools. 
 
 ### SQL server installation  and configuration
 
-#### sql characteristic
+#### sql characteristics
 
-First in characteristic configurations we select all unless R services, ¿What services we need to activated? The best practice for installation of SQL server is only select the service that we are going to use, not all it depends of the requirement. 
+First in characteristic configurations we select all except R services, ¿What services do we need to activate? The best practice for installation of an SQL server is to select only the services that we are going to use depending on requierments and not of them. 
 
 #### id instance 
 
-If we are going to have multiple instance, the recommendation is to change the name to a explicit one, a server can manage a number of 120 instances more and less. 
+If we are going to have multiple instances, the recommendation is to change the name to an explicit one, a server can manage a number up to 120 instances more or less. 
 
 #### sql services
 
-SQL server creates anonyms user accounts service to run it, but the best practices is to have a user to run this server this user doesn't need to have login privileges, is a services account user. 
+The SQL server creates anonymus user accounts service to run it, but the best practice is to have a user run this server. This user doesn't need to have login privileges, they can be services account user. 
 
 ####  database engine configurations
 
-Here we create *sa* user for administration, and we can add other users, then here we configure Data directory, so here we have to distribute the files that de database engine generates and need to operate. 
+Here we create the *sa* user for administration, and we can add other users as needed. Then here we can the configure Data directory. Here we have to distribute the files that the database engine generates and that it needs to operate. 
 
 - root data pad: (MDF)
 - backup pad: we configure the backup partition (BACKUP)
@@ -44,11 +44,11 @@ Here we create *sa* user for administration, and we can add other users, then he
 - database pad: all data of databases (MDF)
 - tempdb pad: tempdb data (TEMPDB)
 
-> FILESTREAM options if for storage image on our db, we active this options if we want. 
+> FILESTREAM options if we want to store images on our data base and we can also active this option. 
 
 ### SQL configuration manager 
 
-Here we can see a lot of information about our SQL server, we can see the status of the service and we can change some properties if we need, in this case we are going to assign all services to a services account that we already create.
+Here we can see a lot of information about our SQL server, we can see the status of the service and if we need to, we can change some properties. In this case we are going to assign all services to a services account that we have already created.
 
 #### port configuration
 
@@ -60,7 +60,7 @@ In network configurations we have to enable Named Pipes and in TCP/IP we have to
 
 #### hide sql server instance
 
-Hide SQL server instances in the view of Configuration Manager
+Hide SQL server instances in the from the Configuration Manager
 
 ```
 Configuration Manager > Network configuration > Protocols > Properties > Hide > on
@@ -68,9 +68,9 @@ Configuration Manager > Network configuration > Protocols > Properties > Hide > 
 
 ### ApexSQL installation 
 
-Apex is an intelligence interpreter that help us to create Querys more faster. 
+Apex is an intelligent interpreter that helps us to create Querys faster. 
 
-First of all, we need to disactivate Intelligence from SQL server this is the default interpreter, so we go...
+First of all, we need to disactivate IntelliSense from SQL server. This is the default interpreter, therefore we go to..
 
 ```
 Tools > Options > Transact-SQL > IntelliSense > Disable
@@ -85,11 +85,11 @@ ApexSQL > Enable
 
 ### SQL ToolBelt
 
-This software make us more productivity when we are searching objects, writing query's and using shortcuts also have a documentary element to generate  Data dictionary. 
+This software make us more productivity when we are searching for objects, writing query's and using shortcuts also have a documentary element to generate Data dictionary. 
 
 ## Audit
 
-We have the options in properties of the instance to enable C2 audit tracing, this with the objective to track all SQL statements that's tun in the instance. 
+We have the options in properties of the instance to enable C2 audit tracing, this with the objective to track all SQL statements that's run in the instance. 
 
 ```
 InstaceSQL > Properties > Security > Enable C2 audit tracing
