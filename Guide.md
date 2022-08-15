@@ -1,6 +1,99 @@
 ## Advance guideness for SQL server
 
-### Enviroment configuration
+### SQL server arquitecture
+
+![image-20220815134049638](https://www.guru99.com/images/1/030119_1009_SQLServerAr1.png)
+
+#### - Protocol layer
+
+The communication component manage the message between client and server.   
+
+We can divide the protocol layer component in the following parts...
+
+- Shared memory: Communication local process. 
+- TCP/IP: Communication remote process. 
+- Named pipes: Communication business network process.   
+
+All of these protocols use a especial networking packaging named TDS (Tabular Data Stream). This way server and client can process the traffic.  
+
+#### - Relation Engine (Query processor)
+
+Basically its in charge to manage incoming request (Query) processing it using the most efficient algorithms to then return the result.   
+
+- CMD parser: This is the first component that process the incoming request (Query). He look for syntaxis error and semantic error to then generate a query tree. 
+
+  ```
+  Evaluation [Syntaxis -> Semantic -> Query tree]
+  ```
+
+- Optimizer: This component generate a execution plan for the request (Query) if its necessary. This way the optimizer try to to de cheapest query possible base in the following parameters *CPU*, *Disc* and *Memory*. The operations that takes to optimize are only DML (SELECT) no DDL (ALTER). The optimizer process can be divide in the following phases:
+
+1. Phase 01: Evaluate if it necessary to find a optimum execution plan. This is because the process of searching a execution plan can be more expensive. 
+2. Phase 02: If the request (query) need a execution plan, there are two types simple execution plan that have one index per table and complex execution plan that have n index per table.
+3.  Phase 03: If none of the above strategies work, Optimizer search for parallel processing possibilities, depending on the actual resource that have the instance. If that is still not possible then the final optimization phase starts. Now, the final optimization aim is finding all other possible options for executing the query in the best way. 
+   Final optimization phase Algorithms are Microsoft Propriety.
+
+These tree phases are part of the build of the execution plan.  
+
+- Query executor: This component calls access method to give him the execution plan to then return the result information throw the protocol layer . 
+
+#### - Storage engine 
+
+This component that it's in charge of the storage of the data into files over the operating system and then return information in function of the request coming. 
+
+Important data information about pagination.
+
+```
+1 Extend = 8 pages 
+Total size = 64kb 
+1 Page = 8KB 
+```
+
+96 bytes per page for metadata (Page Type, Page Number, Size of Used Space, Size of Free Space, and Pointer to the next page and previous page )
+
+File types 
+
+```
+-> Log files     (.ldf) Uncommited trasactions 
+-> File group    (.ndf) Raw data of the tables. 
+-> Primary Files (.mdf) Information about tables,views, trigger and functions. 
+```
+
+- Access method: This works like a interface between Query executor and buffer manager. The principal functions is to determine if the request (Query) is a SELECT or not. 
+
+- Buffer Manager: Buffer manager can be divide in the following services
+
+  ​	Plan cache: Evaluates if exist a previous storage execution plan that can be use by the 	     	processing request (Query) 
+
+  ​	Data parsing: Provides access to the storage data. we can say that there are two possible 	   	scenarios here. 
+
+  ​	In case data is found it in cache storage, this is data is directly retrieved to Query executor. 
+
+  ​	In case data is not found it in cache storage, the data is consulting using the data files. 
+
+  ​	Dirty pages:  These pages storage  all logical processing of the transaction manager, cache 	data is storage here.  
+
+  - Transaction manager: We can divide transaction manager in tree services 
+
+  Log manager: This component have all the records, updates and transactions throw the transactions logs 
+
+  Logs have Logs Sequence Number with the Transaction ID and Data Modification Record.
+  This is used for keeping track of Transaction Committed and Transaction Rollback.
+
+  lock manager: When we execute a transaction associated to the data storage they pass to a block status.
+
+  - Execution process
+
+  Log Manager start logging and Lock Manager locks the associated data.
+  Data’s copy is maintained in the Buffer cache.
+  Copy of data supposed to be updated is maintained in Log buffer and all the events updates data in Data buffer.
+  Pages which store the data is also known as Dirty Pages.
+  Checkpoint and Write-Ahead Logging: This process run and mark all the page from Dirty Pages to Disk, but the page remains in the cache. Frequency is approximately 1 run per minute.But the page is first pushed to Data page of the log file from Buffer log. This is known as Write Ahead Logging.
+  Lazy Writer: The Dirty page can remain in memory. When SQL server observes a huge load and Buffer memory is needed for a new transaction, it frees up Dirty Pages from the cache. It operates on LRU – Least recently used Algorithm for cleaning page from buffer pool to disk.
+
+> Source: https://www.guru99.com/sql-server-architecture.html
+
+### Environment configuration
 
 To make this guide, we create a Windows Server 2016 virtual environment with the following servers:
 
